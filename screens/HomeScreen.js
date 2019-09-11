@@ -30,7 +30,7 @@ const HomeScreen = props => {
     return (
         <View style={styleSheet.container}>
             <Text style={styleSheet.textStyle}>Hello ! </Text>
-            <Button onPress={removeStorage} title="Remove Storage !"/>
+            {/*<Button onPress={removeStorage} title="Remove Storage !"/>*/}
         </View>
     )
 }

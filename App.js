@@ -10,6 +10,7 @@ const store = init({
     models: {app},
 });
 
+
 export default function App() {
     return (
         <Provider store={store}>
