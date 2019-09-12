@@ -5,7 +5,8 @@ import {ActivityIndicator, StatusBar, View, AsyncStorage} from "react-native";
 const AuthLoadingScreen = props => {
     _bootstrapAsync = async () => {
         const userToken = await AsyncStorage.getItem('name');
-        props.navigation.navigate(userToken ? 'App' : 'Auth');
+        console.log(userToken)
+        props.navigation.navigate(userToken ? 'App' : 'AuthLogin');
     };
 
 

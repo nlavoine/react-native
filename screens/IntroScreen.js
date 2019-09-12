@@ -14,8 +14,13 @@ const styleSheet = {
         justifyContent: 'center',
     },
     nameStyle: {
-        color: 'red',
-        fontSize: 25,
+        color: 'darkcyan',
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    baseLine: {
+        color: '#999',
+        fontSize: 12,
         fontWeight: 'bold'
     },
 };
@@ -39,7 +44,8 @@ const IntroScreen = props => {
 
     return (
         <View style={styleSheet.container}>
-            <Text style={styleSheet.nameStyle}>Bonjour {name}</Text>
+            <Text style={styleSheet.nameStyle}>Successfully logged in</Text>
+            <Text style={styleSheet.baseLine}>Please wait</Text>
         </View>
     )
 };
@@ -49,4 +55,4 @@ IntroScreen.propTypes = {
     }).isRequired
 };
 
-export default IntroScreen;
+export default connect()(IntroScreen);

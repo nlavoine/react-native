@@ -4,23 +4,37 @@ import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 import {Ionicons} from '@expo/vector-icons';
 import HomeScreen from "../screens/HomeScreen";
+import AddCityScreen from "../screens/AddCityScreen";
 //import AuthLoadingScreen from "../screens/AuthLoadingScreen";
 import IntroScreen from "../screens/IntroScreen";
 import IntroFormScreen from "../screens/IntroFormScreen";
-import LogoutScreen from "../screens/LogoutScreen";
-import {Text} from "react-native";
+import {Button, Text} from "react-native";
+import AuthLoadingScreen from "../screens/AuthLoadingScreen";
+
 
 const AppStack = createStackNavigator({
         Home: HomeScreen
-    },
+    }, {
+        navigationOptions: {
+            title: 'Welcome',
+            headerStyle: {
+                backgroundColor: 'darkcyan',
+            },
+            headerMode: "screen",
+            headerTintColor: '#fff',
+        }
+    }
 );
 
-const AuthStack = createStackNavigator(
+const LoginStack = createStackNavigator(
     {
         SignIn: {
             screen: IntroFormScreen,
             navigationOptions: {
+                tabBarVisible: false,
                 title: 'Login',
+                headerLeft: null,
+                gesturesEnabled: false,
                 headerStyle: {
                     backgroundColor: 'darkcyan',
                 },
@@ -31,71 +45,92 @@ const AuthStack = createStackNavigator(
             screen: IntroScreen,
             navigationOptions: {
                 title: 'Welcome',
+                headerLeft: null,
+                gesturesEnabled: false,
                 headerStyle: {
                     backgroundColor: 'darkcyan',
                 },
                 headerTintColor: '#fff',
-                headerLeft : null,
+
             }
         }
     }
+)
+
+const AuthStack = createStackNavigator(
+    {
+        AuthLoading: {
+            screen: AuthLoadingScreen,
+        },
+        AuthLogin: {
+            screen: LoginStack
+        }
+
+    }
 );
 
-const LogoutStack = createStackNavigator({
+
+const TabNav = createBottomTabNavigator(
+    {
+        App: {
+            screen: AppStack,
+            navigationOptions: {
+                tabBarIcon: ({focused, tintColor}) => {
+
+                    const iconName = 'ios-appstore';
+
+                    return <Ionicons name={iconName} size={25} color={tintColor}/>;
+                },
+            },
+        },
+        AddCity: {
+            screen: AddCityScreen,
+            navigationOptions: {
+                tabBarIcon: ({focused, tintColor}) => {
+                    const iconName = 'ios-add';
+                    //const iconName = `ios-finger-print${focused ? '' : '-outline'}`;
+                    return <Ionicons name={iconName} size={25} color={tintColor}/>;
+                },
+            },
+        },
+    },
+    {
+        tabBarOptions: {
+            inactiveTintColor: '#ccc',
+            activeTintColor: '#ffffff',
+            activeBackgroundColor: '#53B5B4',
+            style: {
+                backgroundColor: 'darkcyan',
+            },
+        },
+
+    },
+)
+
+
+/*const LogoutStack = createStackNavigator({
         Logout: LogoutScreen
     },
-);
+);*/
+
 
 export default createAppContainer(
-    createBottomTabNavigator(
+    createSwitchNavigator(
         {
-            App: {
-                screen: AppStack,
-                navigationOptions: {
-                    tabBarIcon: ({focused, tintColor}) => {
+            Auth: AuthStack,
+            Home: TabNav,
 
-                        const iconName = 'ios-appstore';
-                        /*if(focused){
-                            iconName += '-outline';
-                        }*/
-                        //const iconName = `ios-appstore${focused ? '' : '-outline'}`;
-                        return <Ionicons name={iconName} size={25} color={tintColor}/>;
-                    },
-                },
-            },
-            Auth: {
-                screen: AuthStack,
-                navigationOptions: {
-                    tabBarIcon: ({focused, tintColor}) => {
-                        const iconName = 'ios-finger-print';
-                        //const iconName = `ios-finger-print${focused ? '' : '-outline'}`;
-                        return <Ionicons name={iconName} size={25} color={tintColor}/>;
-                    },
-                },
-            },
-            /*Logout: {
-                screen: LogoutStack,
-                navigationOptions: {
-                    tabBarIcon: ({focused, tintColor}) => {
-                        const iconName = 'ios-log-out';
-
-                        //const iconName = `ios-log-out${focused ? '' : '-outline'}`;
-                        return <Ionicons name={iconName} size={25} color={tintColor}/>;
-                    },
-                },
-            },*/
         },
         {
             initialRouteName: 'Auth',
-            tabBarOptions: {
-                inactiveTintColor: '#ccc',
-                activeTintColor: '#fffffc',
-                activeBackgroundColor: '#53B5B4',
-                style: {
+            defaultNavigationOptions: {
+                tabBarVisible: false,
+                headerStyle: {
                     backgroundColor: 'darkcyan',
                 },
-            }
+                headerTintColor: '#fff',
+            },
         },
     )
 )
-;
+
