@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Button, Text, Dimensions, AsyncStorage, TextInput} from 'react-native';
 import {connect} from 'react-redux';
 import CircleCities from "./CircleCities";
+import SearchBar from 'react-native-searchbar';
 
 const {width} = Dimensions.get('window');
 
@@ -11,31 +12,66 @@ const styleSheet = {
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'top',
     },
     textStyle: {
         color: 'darkcyan',
         fontSize: 25,
         fontWeight: 'bold'
     },
+    searchBar: {
+        width: width,
+    }
 };
 
 const AddCityScreen = props => {
-
     async function handleSubmit() {
         if (name !== '') {
             await AsyncStorage.setItem('name', name);
             navigation.navigate('Welcome');
         }
     };
-    const [cityToAdd, setCityToAdd] = useState('');
+
+
+    useEffect(() => {
+        props.navigation.setParams({showSearch: _showSearch});
+    }, []);
+
+
+
+    function _showSearch() {
+        this.searchBar.show();
+    }
+
+    function storeSearch(input) {
+        setSearch(input)
+    }
+
+    function handleResults() {
+        console.log(search);
+        dispatch({type: 'app/getWeatherInformations', payload: search})
+            .then(async function (response) {
+                const cityDatas = [response]
+                await dispatch({type: 'app/setInformationsSearch', payload: cityDatas}).then(function(){
+                    props.navigation.navigate('Search');
+                })
+            });
+    }
+    const {dispatch, app: {informationsSearch}} = props;
+    const [search, setSearch] = useState('');
+
 
     return (
         <View style={styleSheet.container}>
+            <SearchBar
+                ref={(ref) => this.searchBar = ref}
+                handleChangeText={storeSearch}
+                onSubmitEditing={handleResults}
+            />
             <CircleCities {...props}/>
         </View>
     )
 }
 
 
-export default connect()(AddCityScreen);
+export default connect(({app}) => ({app}))(AddCityScreen);

@@ -1,13 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {
     View,
+    FlatList,
     Text,
     Dimensions,
-    FlatList,
-    ActivityIndicator,
-    ScrollView,
-    RefreshControl,
-    ToastAndroid, AsyncStorage
 } from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from "prop-types";
@@ -20,9 +16,17 @@ import SearchBar from "react-native-searchbar";
 const {width} = Dimensions.get('window');
 
 const styleSheet = {
+    mainContainer: {
+        width: width,
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'top',
+    },
     container: {
         width: width,
         flex: 1,
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -76,6 +80,7 @@ const styleSheet = {
 };
 
 
+
 function Item(props) {
 
     return (
@@ -90,10 +95,9 @@ function Item(props) {
     );
 }
 
-
 function AddBtn(props) {
 
-    const {app: {cities}} = props;
+
 
     function addCity() {
         console.log("added city");
@@ -130,7 +134,6 @@ function AddBtn(props) {
 
     return (
         <View>
-
             <Icon style={styleSheet.addCityIcon} name="plus-circle" onPress={addCity} backgroundColor="#3b5998"
                   size={24} color="darkcyan">
             </Icon>
@@ -141,72 +144,34 @@ function AddBtn(props) {
 connect(({app}) => ({app}))(AddBtn)
 
 
-const CircleCities = props => {
+const SearchCities = props => {
 
-    const fetchData = async () => {
-        await dispatch({type: 'app/getWeatherInformationsCircle'})
-    };
     useEffect(() => {
-        fetchData();
+        //fetchData();
     }, []);
 
-    useEffect(() => {
-            setCityInfosCircle(informationsCircle);
-            if (cityInfosCircle) {
-                setShowActivityIndicator(false);
-            }
-        }
-    );
 
+    const {app: {informationsSearch}} = props;
+console.log(informationsSearch);
 
-
-
-    function _onRefresh() {
-        setRefreshing(true);
-        fetchData().then(() => {
-            setRefreshing(false);
-        });
-    }
-
-    const {dispatch, app: {informationsCircle}} = props;
-    const [cityInfosCircle, setCityInfosCircle] = useState(null);
-    const [showActivityIndicator, setShowActivityIndicator] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-
-
-    if (showActivityIndicator) {
-        return (
-            <View style={styleSheet.container}>
-                <ActivityIndicator size="small" color="darkcyan"/>
-            </View>
-        )
-    }
     return (
-
-        <ScrollView refreshControl={
-            <RefreshControl
-                refreshing={refreshing}
-                onRefresh={this._onRefresh}
+        <View style={styleSheet.mainContainer}>
+            <FlatList
+                style={styleSheet.list}
+                data={informationsSearch}
+                renderItem={({item}) => <Item item={item} {...props}/>}
+                keyExtractor={(item, index) => index.toString()}
             />
-        }>
-            <View style={styleSheet.container}>
-                <FlatList
-                    style={styleSheet.list}
-                    data={cityInfosCircle.list}
-                    renderItem={({item}) => <Item item={item} {...props} />}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
-        </ScrollView>
+        </View>
     )
 }
 
-CircleCities.propTypes = {
+SearchCities.propTypes = {
     dispatch: PropTypes.func.isRequired,
     app: PropTypes.shape({
-        informationsCircle: PropTypes.object,
+        informationsSearch: PropTypes.array,
     }).isRequired
 };
 
 
-export default connect(({app}) => ({app}))(CircleCities);
+export default connect(({app}) => ({app}))(SearchCities);

@@ -8,6 +8,7 @@ export const app = {
         cities: ['Valence'],
         //informations: {},
         informationsCircle: null,
+        informationsSearch:null,
     },
     reducers: {
 
@@ -19,7 +20,10 @@ export const app = {
         },
         setInformationsCircle(state, informationsCircle) {
             return {...state, informationsCircle}
-        }
+        },
+        setInformationsSearch(state, informationsSearch) {
+            return {...state, informationsSearch}
+        },
     },
     effects: (dispatch) => ({
         async getWeatherInformations(city, state) {

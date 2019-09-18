@@ -9,6 +9,7 @@ import AuthLoadingScreen from "../screens/AuthLoadingScreen";
 import IntroScreen from "../screens/IntroScreen";
 import IntroFormScreen from "../screens/IntroFormScreen";
 import {Button, Text} from "react-native";
+import SearchCities from "../screens/SearchCities";
 
 
 
@@ -26,16 +27,23 @@ const AppStack = createStackNavigator({
     }
 );
 const AddCityStack = createStackNavigator({
-        Home: AddCityScreen
+        Home: AddCityScreen,
+        Search:SearchCities
     }, {
-        defaultNavigationOptions: {
+        defaultNavigationOptions: ({ navigation }) => ({
             title: 'Add a city',
             headerStyle: {
                 backgroundColor: 'darkcyan',
             },
+            //headerRight:<Ionicons name={'ios-search'} size={25} color={'#ffffff'} style={{marginRight:15}} onPress={() => this.props.navigation.setParams({actionSearch:handleSearch()})}/>,
+            headerRight:<Ionicons name={'ios-search'} size={25} color={'#ffffff'} style={{marginRight:15, padding:15}} onPress={() => {
+             const showFunction = navigation.getParam('showSearch');
+                showFunction();
+            }}
+            />,
             headerMode: "screen",
             headerTintColor: '#fff',
-        }
+        })
     }
 );
 
