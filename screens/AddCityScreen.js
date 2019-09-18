@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {View, Button, Text, Dimensions, AsyncStorage} from 'react-native';
+import {View, Button, Text, Dimensions, AsyncStorage, TextInput} from 'react-native';
 import {connect} from 'react-redux';
+import CircleCities from "./CircleCities";
 
 const {width} = Dimensions.get('window');
 
@@ -21,10 +22,17 @@ const styleSheet = {
 
 const AddCityScreen = props => {
 
+    async function handleSubmit() {
+        if (name !== '') {
+            await AsyncStorage.setItem('name', name);
+            navigation.navigate('Welcome');
+        }
+    };
+    const [cityToAdd, setCityToAdd] = useState('');
+
     return (
         <View style={styleSheet.container}>
-            <Text style={styleSheet.textStyle}>AddCity</Text>
-
+            <CircleCities {...props}/>
         </View>
     )
 }

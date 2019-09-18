@@ -5,18 +5,31 @@ import {createBottomTabNavigator} from 'react-navigation-tabs';
 import {Ionicons} from '@expo/vector-icons';
 import HomeScreen from "../screens/HomeScreen";
 import AddCityScreen from "../screens/AddCityScreen";
-//import AuthLoadingScreen from "../screens/AuthLoadingScreen";
+import AuthLoadingScreen from "../screens/AuthLoadingScreen";
 import IntroScreen from "../screens/IntroScreen";
 import IntroFormScreen from "../screens/IntroFormScreen";
 import {Button, Text} from "react-native";
-import AuthLoadingScreen from "../screens/AuthLoadingScreen";
+
 
 
 const AppStack = createStackNavigator({
         Home: HomeScreen
     }, {
-        navigationOptions: {
+    defaultNavigationOptions: {
             title: 'Welcome',
+            headerStyle: {
+                backgroundColor: 'darkcyan',
+            },
+            headerMode: "screen",
+            headerTintColor: '#fff',
+        }
+    }
+);
+const AddCityStack = createStackNavigator({
+        Home: AddCityScreen
+    }, {
+        defaultNavigationOptions: {
+            title: 'Add a city',
             headerStyle: {
                 backgroundColor: 'darkcyan',
             },
@@ -30,7 +43,7 @@ const LoginStack = createStackNavigator(
     {
         SignIn: {
             screen: IntroFormScreen,
-            navigationOptions: {
+            defaultNavigationOptions: {
                 tabBarVisible: false,
                 title: 'Login',
                 headerLeft: null,
@@ -43,7 +56,7 @@ const LoginStack = createStackNavigator(
         },
         Welcome: {
             screen: IntroScreen,
-            navigationOptions: {
+            defaultNavigationOptions: {
                 title: 'Welcome',
                 headerLeft: null,
                 gesturesEnabled: false,
@@ -77,14 +90,14 @@ const TabNav = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({focused, tintColor}) => {
 
-                    const iconName = 'ios-appstore';
+                    const iconName = 'ios-star';
 
                     return <Ionicons name={iconName} size={25} color={tintColor}/>;
                 },
             },
         },
         AddCity: {
-            screen: AddCityScreen,
+            screen: AddCityStack,
             navigationOptions: {
                 tabBarIcon: ({focused, tintColor}) => {
                     const iconName = 'ios-add';
@@ -96,6 +109,7 @@ const TabNav = createBottomTabNavigator(
     },
     {
         tabBarOptions: {
+            showLabel: false,
             inactiveTintColor: '#ccc',
             activeTintColor: '#ffffff',
             activeBackgroundColor: '#53B5B4',
@@ -117,12 +131,14 @@ const TabNav = createBottomTabNavigator(
 export default createAppContainer(
     createSwitchNavigator(
         {
+            AuthLoading:AuthLoadingScreen,
             Auth: AuthStack,
-            Home: TabNav,
+            App: TabNav,
+
 
         },
         {
-            initialRouteName: 'Auth',
+            initialRouteName: 'AuthLoading',
             defaultNavigationOptions: {
                 tabBarVisible: false,
                 headerStyle: {

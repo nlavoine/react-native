@@ -1,9 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, Dimensions, AsyncStorage, SafeAreaView, FlatList, Image} from 'react-native';
+import {
+    View,
+    Text,
+    Dimensions,
+    AsyncStorage,
+    SafeAreaView,
+    FlatList,
+    Image,
+    RefreshControl,
+    ScrollView, TouchableOpacity, ActivityIndicator
+} from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from "prop-types";
 import {ListItem} from "react-native-elements";
 import {Ionicons} from '@expo/vector-icons';
+import {SwipeListView} from 'react-native-swipe-list-view';
 
 
 const {width} = Dimensions.get('window');
@@ -12,104 +23,209 @@ const styleSheet = {
     container: {
         width: width,
         flex: 1,
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'top',
 
     },
+    textContainer: {
+        display: 'flex',
+        flex: 1,
+        flexDirection: 'column'
+    },
+
     textName: {
+        flex: 1,
         color: 'darkcyan',
         fontSize: 18,
         fontWeight: 'bold',
-        flex: 1,
-        flexDirection: 'row',
     },
-    textBaseLine:{
-        color: '#aaa',
-        fontSize: 14,
-        display:'flex',
+    textBaseLine: {
         flex: 1,
-        flexDirection: 'row',
+        width: '100%',
+        color: '#aaa',
+        padding: 0,
+        fontSize: 14,
     },
     list: {
-        width: '100%'
-
+        width: '100%',
     },
     item: {
-        padding:10,
+        padding: 10,
         //backgroundColor: '#aaa',
-        borderBottomWidth:1,
-        borderColor:'#ccc',
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
         width: '100%',
         flex: 1,
         flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
-        justifyContent: 'flex-start'
+        height:60,
+        backgroundColor: '#FFF',
     },
-    listIcon:{
-        marginRight:10,
-        marginTop:4,
+    listIcon: {
+        marginRight: 15,
+        marginTop: 4,
     },
-    weatherIcon:{
-        width:50,
-        height:50,
+    weatherIcon: {
+        width: 50,
+        height: 50,
+        alignSelf: 'flex-end',
+        paddingTop:4,
+    },
+    deleteIcon: {
+        marginRight: 15,
+        marginTop: 8,
+        padding: 10,
+    },
+    rowBack: {
+        alignItems: 'center',
+        backgroundColor: '#cc0000',
+        color: '#fff',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+        paddingRight: 15,
+        height:60,
     }
 };
 
 
-function Item(item) {
-    return (
-        <View style={styleSheet.item}>
-            <Ionicons  style={styleSheet.listIcon} name='ios-reorder' size={25} color='#999'/>
-            <Text style={styleSheet.textName}>{item.data.name}</Text>
-            <Text style={styleSheet.textBaseLine}>{item.data.main.temp}°C</Text>
-            <Image
-                style={styleSheet.weatherIcon}
-                source={{uri: `http://openweathermap.org/img/wn/${item.data.weather[0].icon}.png`}}
-            />
-        </View>
-    );
+function Item(props) {
+    const {dispatch} = props;
+
+    const [information, setInformation] = useState(null);
+
+    async function getDatas() {
+        await dispatch({type: 'app/getWeatherInformations', payload: props.data})
+            .then(async function (response) {
+                setInformation(response);
+            });
+    }
+
+    useEffect(() => {
+        getDatas();
+    }, []);
+
+
+    if (information) {
+        return (
+            <View style={styleSheet.item}>
+                <Ionicons style={styleSheet.listIcon} name='ios-reorder' size={25} color='#999'/>
+                <View style={styleSheet.textContainer}>
+                    <Text style={styleSheet.textName}>{information.name}</Text>
+                    <Text style={styleSheet.textBaseLine}>Temp. :{information.main.temp}°C</Text>
+                </View>
+                <Image
+                    style={styleSheet.weatherIcon}
+                    source={{uri: `http://openweathermap.org/img/wn/${information.weather[0].icon}.png`}}
+                />
+            </View>
+        );
+    } else {
+        return (
+            <View style={styleSheet.item}>
+                <ActivityIndicator size="small" color="darkcyan" style={styleSheet.textName}/>
+            </View>
+        )
+    }
 }
 
 const HomeScreen = props => {
+
     useEffect(() => {
-        dispatch({type: 'app/getWeatherInformations'})
+        //_bootstrapAsync();
+        //dispatch({type: 'app/getWeatherInformations'})
     }, []);
 
     useEffect(() => {
-            if (informations.length > 0) {
-                setCityInfos(informations);
-                /*console.log("useEffect");
-                console.log(informations);*/
-            }
-        }
-    );
+        /*console.log("Use 2")
+        console.log(informations)*/
+    })
+    /*async function _bootstrapAsync() {
+        console.log("retrieveCities");
 
+        //console.log(json);
 
-    const {dispatch, app: {informations}} = props;
-    const [cityInfos, setCityInfos] = useState('');
-    /*const [nameCity, setNameCity] = useState('');
-    const [temp, setTemp] = useState('');*/
+        //dispatch({type: 'app/getWeatherInformations'})
+        //cities = retrieveCities;
+    }*/
 
+    useEffect(() => {
+        //_bootstrapAsync();
+        AsyncStorage.getItem('favCities')
+            .then(req => JSON.parse(req))
+            .then(json => {
+                //return json
+                dispatch({type: 'app/setCities', payload: {cities: json}})
+                //dispatch({type: 'app/getWeatherInformations'})
+            })
+    }, [cities]);
+
+    function _onRefresh() {
+        console.log("refresh");
+        setRefreshing(true);
+        /*dispatch({type: 'app/getWeatherInformations'}).then(() => {
+            setRefreshing(false);
+        });*/
+    }
+
+    function _deleteCity(cityName) {
+        dispatch({type: 'app/deleteCity', payload: {city: cityName}});
+    }
+
+    const {dispatch, app: {informations, cities}, loading} = props;
+    const [refreshing, setRefreshing] = useState(false);
+    //console.log(props);
     return (
-
-        <SafeAreaView style={styleSheet.container}>
-            <FlatList
-                style={styleSheet.list}
-                data={cityInfos}
-                renderItem={({item}) => <Item data={item}/>}
-                keyExtractor={(item, index) => index.toString()}
+        <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                onRefresh={_onRefresh}
             />
-        </SafeAreaView>
+        }>
+            <SafeAreaView style={styleSheet.container}>
+                {!loading ?
+
+                    <SwipeListView
+                        style={styleSheet.list}
+                        data={cities}
+                        renderItem={({item}) => <Item data={item} {...props}/>}
+                        renderHiddenItem={(data, rowMap) => (
+                            <View style={styleSheet.rowBack}>
+                                <Text>Delete</Text>
+                                <Ionicons style={styleSheet.deleteIcon} name='ios-trash' size={25} color='#fff'
+                                          onPress={_ => _deleteCity(data)}/>
+                            </View>
+                        )}
+                        disableRightSwipe={true}
+                        rightOpenValue={-86}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
+
+                    :
+
+                    <Text>No city to display</Text>
+
+                }
+
+            </SafeAreaView>
+        </ScrollView>
     )
 }
 
 HomeScreen.propTypes = {
     dispatch: PropTypes.func.isRequired,
     app: PropTypes.shape({
-        informations: PropTypes.array,
+        informations: PropTypes.object,
+        cities: PropTypes.array,
     }).isRequired
 };
 
+const mapState = (state) => ({
+    loading: state.loading.effects.app.getWeatherInformations, // true when the `login/submit` effect is running
+    app: state.app,
 
-export default connect(({app}) => ({app}))(HomeScreen);
+})
+
+export default connect(mapState)(HomeScreen);
