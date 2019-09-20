@@ -3,7 +3,7 @@ import {
     View,
     FlatList,
     Text,
-    Dimensions,
+    Dimensions, ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from "prop-types";
@@ -97,8 +97,6 @@ function Item(props) {
 
 function AddBtn(props) {
 
-
-
     function addCity() {
         console.log("added city");
         props.dispatch({type: 'app/addCity', payload: {city: props.name}})
@@ -145,23 +143,57 @@ connect(({app}) => ({app}))(AddBtn)
 
 
 const SearchCities = props => {
-
     useEffect(() => {
-        //fetchData();
+        props.navigation.setParams({showSearch: _showSearch});
     }, []);
 
 
-    const {app: {informationsSearch}} = props;
-console.log(informationsSearch);
+
+    function _showSearch() {
+        this.searchBar.show();
+    }
+
+    function storeSearch(input) {
+
+        setSearch(input)
+    }
+
+    function handleResults() {
+        this.searchBar.hide();
+
+        dispatch({type: 'app/getWeatherInformations', payload: search})
+            .then(async function (response) {
+                const cityDatas = [response]
+                await dispatch({type: 'app/setInformationsSearch', payload: cityDatas})
+            });
+    }
+
+
+    const {dispatch, loading, app: {informationsSearch}} = props;
+    const [search, setSearch] = useState('');
+
 
     return (
         <View style={styleSheet.mainContainer}>
-            <FlatList
-                style={styleSheet.list}
-                data={informationsSearch}
-                renderItem={({item}) => <Item item={item} {...props}/>}
-                keyExtractor={(item, index) => index.toString()}
+            <SearchBar
+                ref={(ref) => this.searchBar = ref}
+                handleChangeText={storeSearch}
+                onSubmitEditing={handleResults}
             />
+            {loading ?
+                <ActivityIndicator
+                    ref={(ref) => this.loader = ref}
+                    size="small" color="darkcyan"
+                />
+                :
+                <FlatList
+                    ref={(ref) => this.list = ref}
+                    style={styleSheet.list}
+                    data={informationsSearch}
+                    renderItem={({item}) => <Item item={item} {...props}/>}
+                    keyExtractor={(item, index) => index.toString()}
+                />
+            }
         </View>
     )
 }
@@ -173,5 +205,9 @@ SearchCities.propTypes = {
     }).isRequired
 };
 
+const mapState = (state) => ({
+    loading: state.loading.effects.app.getWeatherInformations,
+    app: state.app,
 
-export default connect(({app}) => ({app}))(SearchCities);
+})
+export default connect(mapState)(SearchCities);

@@ -9,6 +9,7 @@ export const app = {
         //informations: {},
         informationsCircle: null,
         informationsSearch:null,
+        details:null,
     },
     reducers: {
 
@@ -23,6 +24,9 @@ export const app = {
         },
         setInformationsSearch(state, informationsSearch) {
             return {...state, informationsSearch}
+        },
+        setDetails(state, details) {
+            return {...state, details}
         },
     },
     effects: (dispatch) => ({

@@ -3,6 +3,7 @@ import {View, Button, Text, Dimensions, AsyncStorage, TextInput} from 'react-nat
 import {connect} from 'react-redux';
 import CircleCities from "./CircleCities";
 import SearchBar from 'react-native-searchbar';
+import Toast from "react-native-root-toast";
 
 const {width} = Dimensions.get('window');
 
@@ -48,13 +49,25 @@ const AddCityScreen = props => {
     }
 
     function handleResults() {
-        console.log(search);
         dispatch({type: 'app/getWeatherInformations', payload: search})
             .then(async function (response) {
-                const cityDatas = [response]
-                await dispatch({type: 'app/setInformationsSearch', payload: cityDatas}).then(function(){
-                    props.navigation.navigate('Search');
-                })
+                if(response == 404){
+                    let toast = Toast.show('No city found', {
+                        duration: 3000,
+                        position: Toast.positions.BOTTOM,
+                        shadow: true,
+                        animation: true,
+                        hideOnPress: true,
+                        /*backgroundColor:'darkcyan',*/
+                        delay: 0,
+                    })
+                }else {
+                    console.log(response);
+                    const cityDatas = [response]
+                    await dispatch({type: 'app/setInformationsSearch', payload: cityDatas}).then(function () {
+                        props.navigation.navigate('Search');
+                    })
+                }
             });
     }
     const {dispatch, app: {informationsSearch}} = props;

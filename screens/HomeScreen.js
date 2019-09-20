@@ -6,6 +6,7 @@ import {
     AsyncStorage,
     SafeAreaView,
     FlatList,
+    TouchableHighlight,
     Image,
     RefreshControl,
     ScrollView, TouchableOpacity, ActivityIndicator
@@ -38,6 +39,7 @@ const styleSheet = {
         color: 'darkcyan',
         fontSize: 18,
         fontWeight: 'bold',
+        marginTop:10,
     },
     textBaseLine: {
         flex: 1,
@@ -50,8 +52,6 @@ const styleSheet = {
         width: '100%',
     },
     item: {
-        padding: 10,
-        //backgroundColor: '#aaa',
         borderBottomWidth: 1,
         borderColor: '#ccc',
         width: '100%',
@@ -63,14 +63,15 @@ const styleSheet = {
         backgroundColor: '#FFF',
     },
     listIcon: {
-        marginRight: 15,
-        marginTop: 4,
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 8,
+        padding:6,
     },
     weatherIcon: {
         width: 50,
         height: 50,
         alignSelf: 'flex-end',
-        paddingTop:4,
     },
     deleteIcon: {
         marginRight: 15,
@@ -87,6 +88,12 @@ const styleSheet = {
         paddingLeft: 15,
         paddingRight: 15,
         height:60,
+    },
+    iconContainer:{
+        padding:10,
+        paddingLeft:15,
+        paddingRight:15,
+        marginRight:10,
     }
 };
 
@@ -110,16 +117,20 @@ function Item(props) {
 
     if (information) {
         return (
-            <View style={styleSheet.item}>
+            <View style={styleSheet.item} >
                 <Ionicons style={styleSheet.listIcon} name='ios-reorder' size={25} color='#999'/>
-                <View style={styleSheet.textContainer}>
-                    <Text style={styleSheet.textName}>{information.name}</Text>
-                    <Text style={styleSheet.textBaseLine}>Temp. :{information.main.temp}°C</Text>
-                </View>
                 <Image
                     style={styleSheet.weatherIcon}
                     source={{uri: `http://openweathermap.org/img/wn/${information.weather[0].icon}.png`}}
                 />
+                <View style={styleSheet.textContainer}>
+                    <Text style={styleSheet.textName}>{information.name}</Text>
+                    <Text style={styleSheet.textBaseLine}>Temp. :{information.main.temp}°C</Text>
+                </View>
+                <TouchableHighlight style={styleSheet.iconContainer} onPress={() => {dispatch({type: 'app/setDetails', payload: information}); props.navigation.navigate('Details');}}>
+                    <Ionicons  name='ios-arrow-forward' size={25} color='#999'/>
+                </TouchableHighlight>
+
             </View>
         );
     } else {
@@ -133,23 +144,6 @@ function Item(props) {
 
 const HomeScreen = props => {
 
-    useEffect(() => {
-        //_bootstrapAsync();
-        //dispatch({type: 'app/getWeatherInformations'})
-    }, []);
-
-    useEffect(() => {
-        /*console.log("Use 2")
-        console.log(informations)*/
-    })
-    /*async function _bootstrapAsync() {
-        console.log("retrieveCities");
-
-        //console.log(json);
-
-        //dispatch({type: 'app/getWeatherInformations'})
-        //cities = retrieveCities;
-    }*/
 
     useEffect(() => {
         //_bootstrapAsync();
@@ -165,9 +159,6 @@ const HomeScreen = props => {
     function _onRefresh() {
         console.log("refresh");
         setRefreshing(true);
-        /*dispatch({type: 'app/getWeatherInformations'}).then(() => {
-            setRefreshing(false);
-        });*/
     }
 
     function _deleteCity(cityName) {
